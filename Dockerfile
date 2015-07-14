@@ -1,14 +1,18 @@
-FROM fedora:latest
+#
+# Dockerfile for python-github-webhooks
+#
+
+FROM alpine
 MAINTAINER "Laurent Rineau" <laurent.rineau@cgal.org>
 
-RUN yum -y update
-RUN yum -y install python-pip && yum clean all
+ADD LICENSE requirements.txt webhooks.py config.json /src/
 
-ADD LICENSE requirements.txt webhooks.py config.json hooks /src/
+RUN apk add -U py-pip \
+    && rm -rf /var/cache/apk/* \
+    && pip install -r /src/requirements.txt
 
-RUN cd /src; pip install -r requirements.txt
-
+VOLUME /src/hooks
 EXPOSE 5000
-
 WORKDIR /src
-CMD ["python", "/src/webhooks.py"]
+
+CMD ["python", "webhooks.py"]
